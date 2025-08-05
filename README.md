@@ -1,30 +1,118 @@
-# Aura Digital Gold Dashboard
+# 🌟 Aura Digital Gold 24K Price Tracker Dashboard
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+Track **real-time prices**, **historical trends**, and **calculate gold purchases** instantly.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/sanjib-baradas-projects/v0-aura-digital-gold-dashboard)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/QZD5DE5zXiB)
+## 🌐 Live Website
 
-## Overview
+🔗 **[Aura Gold Price Tracker](https://auragold.netlify.app/)**
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+---
 
-## Deployment
+## 📊 Features
 
-Your project is live at:
+* **Real-Time 24K Gold Prices**
 
-**[https://vercel.com/sanjib-baradas-projects/v0-aura-digital-gold-dashboard](https://vercel.com/sanjib-baradas-projects/v0-aura-digital-gold-dashboard)**
+  * Live **price per gram & per 10 grams**
+  * Auto-refresh **every 5 minutes**
 
-## Build your app
+* **Buy & Sell Price Tracking**
 
-Continue building your app on:
+  * Displays **current buy price & sell price**
+  * Shows **price changes instantly**
 
-**[https://v0.dev/chat/projects/QZD5DE5zXiB](https://v0.dev/chat/projects/QZD5DE5zXiB)**
+* **Gold Purchase Calculator**
 
-## How It Works
+  * Calculate gold value for any **amount in ₹ or grams**
+  * Includes **GST calculation (3%)**
+  * Shows **payable amount instantly**
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+* **Historical Price Data**
+
+  * Complete **timestamped price history**
+  * Exportable to **CSV/Excel**
+
+* **Interactive Charts**
+
+  * Track price movements with:
+
+    * Line Chart
+    * Area Chart
+    * Candlestick Chart
+    * Bar & Volume Charts
+  * Filter by **30 min, 1 hour, 1 week, 1 month, 1 year, all time**
+
+* **Export Options**
+
+  * **Export Table** (historical data)
+  * **Export CSV** (chart data)
+
+---
+
+## 📸 Screenshots
+
+### **Dashboard**
+
+<img width="1886" height="812" alt="image" src="https://github.com/user-attachments/assets/21572b8e-03e9-4d2e-bc2c-cc8824796f60" />
+<img width="1861" height="873" alt="image" src="https://github.com/user-attachments/assets/dfdf4d94-25ee-4ad4-8669-0d0e1119cc89" />
+<img width="1699" height="698" alt="image" src="https://github.com/user-attachments/assets/2cd35a70-f232-49f4-bd5f-ee042e257594" />
+
+---
+
+## ⚡ Tech Stack
+
+* **Frontend:** React
+* **Deployment:** Netlify
+* **Charts:** Chart.js / Recharts
+* **Auto Data Refresh:** JavaScript + JSON API
+
+---
+
+## 🛠️ Local Development
+
+If you want to run this project locally:
+
+```bash
+# Clone the repository
+git clone https://github.com/Darshan101005/AURA_GOLD_PRICE_TRACKER.git
+
+# Navigate to project directory
+cd AURA_GOLD_PRICE_TRACKER
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+Then open `http://localhost:3000` in your browser.
+
+---
+
+## 📦 Build & Deployment
+
+### **Netlify Deployment**
+
+1. Connect your repository to **Netlify**
+2. Set **Build Command**:
+
+```bash
+npm run build
+```
+
+3. Set **Publish Directory** (check your project type):
+
+* React (Vite) → `dist`
+* Create React App → `build`
+
+4. Deploy → **Done!**
+
+---
+
+## 📌 Future Enhancements
+
+* ✅ Price alert notifications (Telegram/Email)
+* ✅ Multi-currency gold price conversion
+* ✅ Dark mode for the dashboard
+
+---
