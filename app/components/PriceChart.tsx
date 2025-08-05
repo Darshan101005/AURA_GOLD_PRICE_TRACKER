@@ -77,7 +77,7 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
           labels,
           datasets: [
             {
-              label: "Gold Price (₹/g)",
+              label: "Price (₹/g)", // Generic label
               data: sortedData.map((item) => item.price_with_gst),
               borderColor: "rgb(202, 138, 4)",
               backgroundColor: "rgba(202, 138, 4, 0.3)",
@@ -126,7 +126,7 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
           labels,
           datasets: [
             {
-              label: "Trading Volume", // Changed from "Trading Volume (Simulated)"
+              label: "Trading Volume",
               data: candlestickData.map((item) => item.volume),
               backgroundColor: "rgba(99, 102, 241, 0.8)",
               borderColor: "rgb(99, 102, 241)",

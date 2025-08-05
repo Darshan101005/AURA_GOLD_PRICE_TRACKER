@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group" // New import
-import { Button } from "@/components/ui/button" // Import Button
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Button } from "@/components/ui/button"
 
 interface PriceData {
   product_name: string
@@ -19,11 +19,12 @@ interface PriceData {
 
 interface GoldCalculatorProps {
   latestPrice: PriceData | null
+  metalType: "gold" | "silver" // New prop to indicate metal type
 }
 
 const GST_RATE = 0.03 // 3% GST
 
-export default function GoldCalculator({ latestPrice }: GoldCalculatorProps) {
+export default function GoldCalculator({ latestPrice, metalType }: GoldCalculatorProps) {
   const [calculationType, setCalculationType] = useState<"rupees" | "grams">("rupees")
   const [inputValue, setInputValue] = useState<string>("")
   const [calculatedResults, setCalculatedResults] = useState<{
@@ -34,10 +35,10 @@ export default function GoldCalculator({ latestPrice }: GoldCalculatorProps) {
   } | null>(null)
 
   useEffect(() => {
-    // Reset inputs and results when latestPrice changes or component mounts
+    // Reset inputs and results when latestPrice or metalType changes
     setInputValue("")
     setCalculatedResults(null)
-  }, [latestPrice, calculationType]) // Reset when calculation type changes too
+  }, [latestPrice, calculationType, metalType]) // Added metalType to dependency array
 
   const handleCalculate = () => {
     if (!latestPrice || !inputValue) {
@@ -81,7 +82,9 @@ export default function GoldCalculator({ latestPrice }: GoldCalculatorProps) {
   return (
     <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-700">Gold Purchase Calculator</CardTitle>
+        <CardTitle className="text-lg font-semibold text-slate-700">
+          {metalType === "gold" ? "Gold" : "Silver"} Purchase Calculator
+        </CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
@@ -141,11 +144,11 @@ export default function GoldCalculator({ latestPrice }: GoldCalculatorProps) {
               </div>
               <Separator />
               <div className="flex justify-between">
-                <span className="text-slate-600">Gold Quantity:</span>
+                <span className="text-slate-600">{metalType === "gold" ? "Gold" : "Silver"} Quantity:</span>
                 <span className="font-medium text-slate-800">{calculatedResults.goldQuantity.toFixed(4)} g</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Gold Value (ex-GST):</span>
+                <span className="text-slate-600">Value (ex-GST):</span>
                 <span className="font-medium text-slate-800">₹{calculatedResults.goldValue.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">

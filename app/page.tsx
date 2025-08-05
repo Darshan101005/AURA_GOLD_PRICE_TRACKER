@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   CalendarIcon,
   RefreshCw,
@@ -21,7 +22,7 @@ import {
 import { format } from "date-fns"
 import PriceChart from "./components/PriceChart"
 import PriceTable from "./components/PriceTable"
-import GoldCalculator from "./components/GoldCalculator" // New import
+import GoldCalculator from "./components/GoldCalculator"
 import { cn } from "@/lib/utils"
 
 interface PriceData {
@@ -53,6 +54,7 @@ const chartTypes = [
 ]
 
 export default function Dashboard() {
+  const [selectedMetal, setSelectedMetal] = useState<"gold" | "silver">("gold")
   const [allPriceData, setAllPriceData] = useState<PriceData[]>([])
   const [filteredPriceData, setFilteredPriceData] = useState<PriceData[]>([])
   const [latestPrice, setLatestPrice] = useState<PriceData | null>(null)
@@ -64,12 +66,12 @@ export default function Dashboard() {
   const [chartType, setChartType] = useState("line")
   const [error, setError] = useState<string | null>(null)
 
-  // Filter data based on timeframe
-  const filterDataByTimeframe = (
+  // Client-side filter function (for custom date range and initial display)
+  const filterDataByTimeframeClient = (
     data: PriceData[],
     timeframe: string,
-    startDate?: string,
-    endDate?: string,
+    startDate?: Date,
+    endDate?: Date,
   ): PriceData[] => {
     if (!data || data.length === 0) return []
 
@@ -101,7 +103,10 @@ export default function Dashboard() {
         if (startDate && endDate) {
           return data.filter((item) => {
             const itemDate = new Date(item.updated_at)
-            return itemDate >= new Date(startDate) && itemDate <= new Date(endDate + "T23:59:59")
+            return (
+              itemDate >= startDate &&
+              itemDate <= new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59)
+            )
           })
         }
         return data
@@ -118,7 +123,8 @@ export default function Dashboard() {
     setError(null)
 
     try {
-      const response = await fetch("/api/gold-prices")
+      const params = new URLSearchParams({ metal: selectedMetal })
+      const response = await fetch(`/api/prices?${params}`)
 
       if (!response.ok) {
         throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`)
@@ -136,14 +142,12 @@ export default function Dashboard() {
         throw new Error("Invalid data format received")
       }
 
-      // Sort data by date (newest first)
       const sortedData = data.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
 
       setAllPriceData(sortedData)
       setLatestPrice(sortedData[0] || null)
 
-      // Apply current timeframe filter
-      const filtered = filterDataByTimeframe(sortedData, activeTimeframe)
+      const filtered = filterDataByTimeframeClient(sortedData, activeTimeframe, customStartDate, customEndDate)
       setFilteredPriceData(filtered)
     } catch (err) {
       console.error("Error fetching data:", err)
@@ -160,7 +164,7 @@ export default function Dashboard() {
   const handleTimeframeChange = (timeframe: string) => {
     setActiveTimeframe(timeframe)
     if (timeframe !== "custom") {
-      const filtered = filterDataByTimeframe(allPriceData, timeframe)
+      const filtered = filterDataByTimeframeClient(allPriceData, timeframe)
       setFilteredPriceData(filtered)
     }
   }
@@ -168,12 +172,7 @@ export default function Dashboard() {
   // Handle custom date range
   const handleCustomDateSubmit = () => {
     if (customStartDate && customEndDate) {
-      const filtered = filterDataByTimeframe(
-        allPriceData,
-        "custom",
-        format(customStartDate, "yyyy-MM-dd"),
-        format(customEndDate, "yyyy-MM-dd"),
-      )
+      const filtered = filterDataByTimeframeClient(allPriceData, "custom", customStartDate, customEndDate)
       setFilteredPriceData(filtered)
     }
   }
@@ -219,7 +218,7 @@ export default function Dashboard() {
     const url = URL.createObjectURL(blob)
 
     link.setAttribute("href", url)
-    link.setAttribute("download", `aura-gold-prices-${format(new Date(), "yyyy-MM-dd-HHmm")}.csv`)
+    link.setAttribute("download", `aura-${selectedMetal}-prices-${format(new Date(), "yyyy-MM-dd-HHmm")}.csv`)
     link.style.visibility = "hidden"
     document.body.appendChild(link)
     link.click()
@@ -227,41 +226,94 @@ export default function Dashboard() {
     URL.revokeObjectURL(url)
   }
 
-  // Initial data fetch
+  // Initial data fetch and auto-refresh
   useEffect(() => {
     fetchData()
 
-    // Auto-refresh every 5 minutes
     const interval = setInterval(fetchData, 5 * 60 * 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [selectedMetal])
 
-  // Update filtered data when timeframe changes
+  // Update filtered data when allPriceData or timeframe changes
   useEffect(() => {
     if (allPriceData.length > 0) {
-      const filtered = filterDataByTimeframe(allPriceData, activeTimeframe)
+      const filtered = filterDataByTimeframeClient(allPriceData, activeTimeframe, customStartDate, customEndDate)
       setFilteredPriceData(filtered)
     }
-  }, [allPriceData, activeTimeframe])
+  }, [allPriceData, activeTimeframe, customStartDate, customEndDate])
+
+  const metalColors = {
+    gold: {
+      gradient: "from-yellow-600 to-yellow-500",
+      text: "text-yellow-600",
+      buttonBg: "bg-yellow-600 hover:bg-yellow-700",
+      spinner: "text-yellow-600",
+    },
+    silver: {
+      gradient: "from-slate-500 to-slate-400",
+      text: "text-slate-600",
+      buttonBg: "bg-slate-500 hover:bg-slate-600",
+      spinner: "text-slate-600",
+    },
+  }
+
+  const currentColors = metalColors[selectedMetal]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
       {/* Website Heading (Browser Tab Title) */}
-      <title>Aura Digital Gold Dashboard</title>
+      <title>Aura Digital {selectedMetal === "gold" ? "Gold" : "Silver"} Dashboard</title>
 
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent">
-            Aura Digital Gold 24K
+          <h1
+            className={cn(
+              "text-4xl font-bold bg-clip-text text-transparent",
+              `bg-gradient-to-r ${currentColors.gradient}`,
+            )}
+          >
+            Aura Digital {selectedMetal === "gold" ? "Gold" : "Silver"} 24K
           </h1>
-          <p className="text-slate-600">Real-time gold price tracking dashboard</p>
+          <p className="text-slate-600">Real-time {selectedMetal} price tracking dashboard</p>
           {!loading && !error && (
             <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               Live Data • Auto-refresh every 5 minutes
             </div>
           )}
+        </div>
+
+        {/* Metal Toggle */}
+        <div className="flex justify-center mb-6">
+          <ToggleGroup
+            type="single"
+            value={selectedMetal}
+            onValueChange={(value: "gold" | "silver") => {
+              if (value) {
+                setSelectedMetal(value)
+                setActiveTimeframe("all")
+                setCustomStartDate(undefined)
+                setCustomEndDate(undefined)
+              }
+            }}
+            className="bg-white/80 rounded-lg shadow-xl p-1"
+          >
+            <ToggleGroupItem
+              value="gold"
+              aria-label="Toggle Gold"
+              className="px-6 py-2 text-lg font-semibold data-[state=on]:bg-yellow-600 data-[state=on]:text-white data-[state=on]:shadow-md"
+            >
+              Gold
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="silver"
+              aria-label="Toggle Silver"
+              className="px-6 py-2 text-lg font-semibold data-[state=on]:bg-slate-500 data-[state=on]:text-white data-[state=on]:shadow-md"
+            >
+              Silver
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
 
         {/* Error Message */}
@@ -293,7 +345,9 @@ export default function Dashboard() {
           <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-slate-700">Latest Gold Price</CardTitle>
+                <CardTitle className="text-lg font-semibold text-slate-700">
+                  Latest {selectedMetal === "gold" ? "Gold" : "Silver"} Price
+                </CardTitle>
                 <Button
                   onClick={fetchData}
                   disabled={loading}
@@ -310,7 +364,9 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-3xl font-bold text-yellow-600">₹{latestPrice.price_with_gst.toFixed(2)}</span>
+                    <span className={cn("text-3xl font-bold", currentColors.text)}>
+                      ₹{latestPrice.price_with_gst.toFixed(2)}
+                    </span>
                     <span className="text-sm text-slate-500">/gram</span>
                     {priceChange !== 0 && (
                       <Badge variant={priceChange > 0 ? "default" : "destructive"} className="gap-1">
@@ -348,7 +404,7 @@ export default function Dashboard() {
         )}
 
         {/* Gold Calculator */}
-        {latestPrice && !loading && <GoldCalculator latestPrice={latestPrice} />}
+        {latestPrice && !loading && <GoldCalculator latestPrice={latestPrice} metalType={selectedMetal} />}
 
         {/* Chart Controls */}
         {!loading && (
@@ -365,7 +421,7 @@ export default function Dashboard() {
                       size="sm"
                       className={cn(
                         "transition-all duration-200",
-                        activeTimeframe === timeframe.id && "bg-yellow-600 hover:bg-yellow-700",
+                        activeTimeframe === timeframe.id && currentColors.buttonBg,
                       )}
                     >
                       {timeframe.label}
@@ -446,7 +502,7 @@ export default function Dashboard() {
                     onClick={handleCustomDateSubmit}
                     disabled={!customStartDate || !customEndDate}
                     size="sm"
-                    className="bg-yellow-600 hover:bg-yellow-700"
+                    className={currentColors.buttonBg}
                   >
                     Apply Filter
                   </Button>
@@ -461,7 +517,8 @@ export default function Dashboard() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold text-slate-700">
-                Price Trend - {chartTypes.find((t) => t.id === chartType)?.label}
+                {selectedMetal === "gold" ? "Gold" : "Silver"} Price Trend -{" "}
+                {chartTypes.find((t) => t.id === chartType)?.label}
               </CardTitle>
               <div className="flex gap-2">
                 <Badge variant="outline" className="text-xs">
@@ -477,7 +534,7 @@ export default function Dashboard() {
             {loading ? (
               <div className="flex items-center justify-center h-64">
                 <div className="text-center space-y-4">
-                  <RefreshCw className="h-8 w-8 animate-spin text-yellow-600 mx-auto" />
+                  <RefreshCw className={cn("h-8 w-8 animate-spin mx-auto", currentColors.spinner)} />
                   <p className="text-slate-600">Loading price data...</p>
                 </div>
               </div>
@@ -506,7 +563,9 @@ export default function Dashboard() {
           <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-slate-700">Historical Prices</CardTitle>
+                <CardTitle className="text-lg font-semibold text-slate-700">
+                  Historical {selectedMetal === "gold" ? "Gold" : "Silver"} Prices
+                </CardTitle>
                 <Badge variant="outline" className="text-xs">
                   Showing {filteredPriceData.length} records
                 </Badge>

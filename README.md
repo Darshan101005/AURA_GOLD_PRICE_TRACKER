@@ -71,7 +71,7 @@ Track **real-time prices**, **historical trends**, and **calculate gold purchase
 
 If you want to run this project locally:
 
-```bash
+\`\`\`bash
 # Clone the repository
 git clone https://github.com/Darshan101005/AURA_GOLD_PRICE_TRACKER.git
 
@@ -83,7 +83,7 @@ npm install
 
 # Start the development server
 npm run dev
-```
+\`\`\`
 
 Then open `http://localhost:3000` in your browser.
 
@@ -96,9 +96,9 @@ Then open `http://localhost:3000` in your browser.
 1. Connect your repository to **Netlify**
 2. Set **Build Command**:
 
-```bash
+\`\`\`bash
 npm run build
-```
+\`\`\`
 
 3. Set **Publish Directory** (check your project type):
 
