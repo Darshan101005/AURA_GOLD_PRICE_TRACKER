@@ -273,7 +273,7 @@ export default function Dashboard() {
               `bg-gradient-to-r ${currentColors.gradient}`,
             )}
           >
-            Aura Digital {selectedMetal === "gold" ? "Gold" : "Silver"} 24K
+            Aura Digital {selectedMetal === "gold" ? "Gold 24K" : "Silver"}
           </h1>
           <p className="text-slate-600">Real-time {selectedMetal} price tracking dashboard</p>
           {!loading && !error && (
