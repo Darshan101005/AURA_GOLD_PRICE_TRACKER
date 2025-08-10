@@ -18,6 +18,7 @@ import {
   Activity,
   BarChart,
   AlertCircle,
+  ArrowUpDown,
 } from "lucide-react"
 import { format } from "date-fns"
 import PriceChart from "./components/PriceChart"
@@ -268,12 +269,16 @@ export default function Dashboard() {
   const currentColors = metalColors[selectedMetal]
 
   // Derived stats: today's and all-time high/low with timestamps
-  const { todayHigh, todayLow, allTimeHigh, allTimeLow } = useMemo(() => {
+  const { todayHigh, todayLow, allTimeHigh, allTimeLow, todayDiffAmount, todayDiffPercent, allTimeDiffAmount, allTimeDiffPercent } = useMemo(() => {
     const result = {
       todayHigh: null as null | PriceData,
       todayLow: null as null | PriceData,
       allTimeHigh: null as null | PriceData,
       allTimeLow: null as null | PriceData,
+      todayDiffAmount: 0,
+      todayDiffPercent: 0,
+      allTimeDiffAmount: 0,
+      allTimeDiffPercent: 0,
     }
 
     if (!allPriceData || allPriceData.length === 0) return result
@@ -302,6 +307,22 @@ export default function Dashboard() {
       result.todayLow = todayData.reduce((min, curr) =>
         !min || curr.price_with_gst < min.price_with_gst ? curr : min,
       null as null | PriceData)
+
+      if (result.todayHigh && result.todayLow) {
+        result.todayDiffAmount = result.todayHigh.price_with_gst - result.todayLow.price_with_gst
+        result.todayDiffPercent =
+          result.todayLow.price_with_gst > 0
+            ? (result.todayDiffAmount / result.todayLow.price_with_gst) * 100
+            : 0
+      }
+    }
+
+    if (result.allTimeHigh && result.allTimeLow) {
+      result.allTimeDiffAmount = result.allTimeHigh.price_with_gst - result.allTimeLow.price_with_gst
+      result.allTimeDiffPercent =
+        result.allTimeLow.price_with_gst > 0
+          ? (result.allTimeDiffAmount / result.allTimeLow.price_with_gst) * 100
+          : 0
     }
 
     return result
@@ -469,6 +490,14 @@ export default function Dashboard() {
                         {todayLow ? format(new Date(todayLow.updated_at), "hh:mm a") : ""}
                       </div>
                     </div>
+                    <div>
+                      <div className="text-slate-500 flex items-center gap-1">
+                        <ArrowUpDown className="h-3.5 w-3.5" /> Difference
+                      </div>
+                      <div className="font-semibold text-slate-800">
+                        {todayHigh && todayLow ? `₹${todayDiffAmount.toFixed(2)} (${todayDiffPercent.toFixed(2)}%)` : "—"}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
@@ -490,6 +519,16 @@ export default function Dashboard() {
                       </div>
                       <div className="text-slate-500">
                         {allTimeLow ? `${format(new Date(allTimeLow.updated_at), "MMM dd, yyyy")} • ${format(new Date(allTimeLow.updated_at), "hh:mm a")}` : ""}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-slate-500 flex items-center gap-1">
+                        <ArrowUpDown className="h-3.5 w-3.5" /> Difference
+                      </div>
+                      <div className="font-semibold text-slate-800">
+                        {allTimeHigh && allTimeLow
+                          ? `₹${allTimeDiffAmount.toFixed(2)} (${allTimeDiffPercent.toFixed(2)}%)`
+                          : "—"}
                       </div>
                     </div>
                   </div>

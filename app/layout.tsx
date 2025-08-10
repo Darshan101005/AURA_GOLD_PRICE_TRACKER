@@ -35,10 +35,8 @@ export const metadata: Metadata = {
     siteName: 'Aura Gold Price Tracker',
     images: [
       {
-        url: '/placeholder.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Aura Gold Price Tracker',
+        url: 'https://auragold.in/Shine.svg',
+        alt: 'Aura Gold Price Tracker Logo',
       },
     ],
   },
@@ -47,7 +45,7 @@ export const metadata: Metadata = {
     title: 'Aura Gold Price Tracker | Live 24K Gold & Silver Rates',
     description:
       'Live gold and silver rate tracker with charts, daily high/low, and CSV export. Auto-refreshed.',
-    images: ['/placeholder.jpg'],
+    images: ['https://auragold.in/Shine.svg'],
   },
   robots: {
     index: true,
@@ -61,9 +59,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/placeholder-logo.png',
-    shortcut: '/placeholder-logo.png',
-    apple: '/placeholder-logo.png',
+    icon: 'https://auragold.in/Shine.svg',
+    shortcut: 'https://auragold.in/Shine.svg',
+    apple: 'https://auragold.in/Shine.svg',
   },
   generator: 'v0.dev',
 }
@@ -101,7 +99,7 @@ export default function RootLayout({
               '@type': 'Organization',
               name: 'Aura Digital',
               url: siteUrl,
-              logo: `${siteUrl}/placeholder-logo.png`,
+              logo: 'https://auragold.in/Shine.svg',
             }),
           }}
         />
