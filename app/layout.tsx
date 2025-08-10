@@ -3,9 +3,68 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 
+const siteUrl = 'https://auragold.netlify.app'
+
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'Aura Gold Price Tracker | Live 24K Gold & Silver Rates',
+    template: '%s | Aura Gold Price Tracker',
+  },
+  description:
+    'Real-time 24K gold and silver price tracker with historical charts, daily high/low, buy/sell rates, and CSV export. Updated every 5 minutes.',
+  keywords: [
+    'gold price',
+    'gold rate today',
+    '24k gold price',
+    'silver price',
+    'gold price chart',
+    'aura digital gold',
+    'gold buy price',
+    'gold sell price',
+  ],
+  alternates: {
+    canonical: siteUrl,
+  },
+  openGraph: {
+    type: 'website',
+    url: siteUrl,
+    title: 'Aura Gold Price Tracker | Live 24K Gold & Silver Rates',
+    description:
+      'Track live gold and silver prices with daily high/low, historical charts, and CSV export. Updated every 5 minutes.',
+    siteName: 'Aura Gold Price Tracker',
+    images: [
+      {
+        url: '/placeholder.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Aura Gold Price Tracker',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Aura Gold Price Tracker | Live 24K Gold & Silver Rates',
+    description:
+      'Live gold and silver rate tracker with charts, daily high/low, and CSV export. Auto-refreshed.',
+    images: ['/placeholder.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: '/placeholder-logo.png',
+    shortcut: '/placeholder-logo.png',
+    apple: '/placeholder-logo.png',
+  },
   generator: 'v0.dev',
 }
 
@@ -17,6 +76,35 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="canonical" href={siteUrl} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'Aura Gold Price Tracker',
+              url: siteUrl,
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: `${siteUrl}/?q={search_term_string}`,
+                'query-input': 'required name=search_term_string',
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Aura Digital',
+              url: siteUrl,
+              logo: `${siteUrl}/placeholder-logo.png`,
+            }),
+          }}
+        />
         <style>{`
 html {
   font-family: ${GeistSans.style.fontFamily};

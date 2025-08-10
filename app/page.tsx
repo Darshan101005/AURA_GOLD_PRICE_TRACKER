@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -38,6 +38,7 @@ const timeframes = [
   { id: "30min", label: "30 Min" },
   { id: "hour", label: "1 Hour" },
   { id: "today", label: "Today" },
+  { id: "yesterday", label: "Yesterday" },
   { id: "week", label: "1 Week" },
   { id: "month", label: "1 Month" },
   { id: "year", label: "1 Year" },
@@ -46,9 +47,8 @@ const timeframes = [
 ]
 
 const chartTypes = [
-  { id: "line", label: "Line Chart", icon: LineChart },
   { id: "area", label: "Area Chart", icon: Activity },
-  { id: "candlestick", label: "Candlestick", icon: BarChart3 },
+  { id: "line", label: "Line Chart", icon: LineChart },
   { id: "bar", label: "Bar Chart", icon: BarChart },
   { id: "volume", label: "Volume Chart", icon: BarChart3 },
 ]
@@ -58,12 +58,12 @@ export default function Dashboard() {
   const [allPriceData, setAllPriceData] = useState<PriceData[]>([])
   const [filteredPriceData, setFilteredPriceData] = useState<PriceData[]>([])
   const [latestPrice, setLatestPrice] = useState<PriceData | null>(null)
-  const [activeTimeframe, setActiveTimeframe] = useState("all")
+  const [activeTimeframe, setActiveTimeframe] = useState("today")
   const [showTable, setShowTable] = useState(true)
   const [loading, setLoading] = useState(true)
   const [customStartDate, setCustomStartDate] = useState<Date>()
   const [customEndDate, setCustomEndDate] = useState<Date>()
-  const [chartType, setChartType] = useState("line")
+  const [chartType, setChartType] = useState("area")
   const [error, setError] = useState<string | null>(null)
 
   // Client-side filter function (for custom date range and initial display)
@@ -88,6 +88,14 @@ export default function Dashboard() {
       case "today":
         filterDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
         break
+      case "yesterday": {
+        const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+        const endOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59, 999)
+        return data.filter((item) => {
+          const d = new Date(item.updated_at)
+          return d >= startOfYesterday && d <= endOfYesterday
+        })
+      }
       case "week":
         filterDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
         break
@@ -259,11 +267,48 @@ export default function Dashboard() {
 
   const currentColors = metalColors[selectedMetal]
 
+  // Derived stats: today's and all-time high/low with timestamps
+  const { todayHigh, todayLow, allTimeHigh, allTimeLow } = useMemo(() => {
+    const result = {
+      todayHigh: null as null | PriceData,
+      todayLow: null as null | PriceData,
+      allTimeHigh: null as null | PriceData,
+      allTimeLow: null as null | PriceData,
+    }
+
+    if (!allPriceData || allPriceData.length === 0) return result
+
+    // All-time
+    result.allTimeHigh = allPriceData.reduce((max, curr) =>
+      !max || curr.price_with_gst > max.price_with_gst ? curr : max,
+    null as null | PriceData)
+    result.allTimeLow = allPriceData.reduce((min, curr) =>
+      !min || curr.price_with_gst < min.price_with_gst ? curr : min,
+    null as null | PriceData)
+
+    // Today (local time)
+    const now = new Date()
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
+    const todayData = allPriceData.filter((item) => {
+      const d = new Date(item.updated_at)
+      return d >= startOfToday && d <= endOfToday
+    })
+
+    if (todayData.length > 0) {
+      result.todayHigh = todayData.reduce((max, curr) =>
+        !max || curr.price_with_gst > max.price_with_gst ? curr : max,
+      null as null | PriceData)
+      result.todayLow = todayData.reduce((min, curr) =>
+        !min || curr.price_with_gst < min.price_with_gst ? curr : min,
+      null as null | PriceData)
+    }
+
+    return result
+  }, [allPriceData])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-      {/* Website Heading (Browser Tab Title) */}
-      <title>Aura Digital {selectedMetal === "gold" ? "Gold" : "Silver"} Dashboard</title>
-
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -292,7 +337,7 @@ export default function Dashboard() {
             onValueChange={(value: "gold" | "silver") => {
               if (value) {
                 setSelectedMetal(value)
-                setActiveTimeframe("all")
+                setActiveTimeframe("today")
                 setCustomStartDate(undefined)
                 setCustomEndDate(undefined)
               }
@@ -340,7 +385,8 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Latest Price Card */}
+        {/* Latest Price Card */
+        }
         {latestPrice && !loading && (
           <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
             <CardHeader className="pb-3">
@@ -397,6 +443,56 @@ export default function Dashboard() {
                     {format(new Date(latestPrice.updated_at), "MMM dd, yyyy")}
                   </div>
                   <div className="text-sm text-slate-500">{format(new Date(latestPrice.updated_at), "hh:mm a")}</div>
+                </div>
+              </div>
+
+              {/* High/Low Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div className="rounded-lg border border-yellow-100 bg-yellow-50/50 p-4">
+                  <div className="text-sm font-semibold text-yellow-800 mb-2">Today's Range</div>
+                  <div className="flex flex-wrap gap-6 text-sm">
+                    <div>
+                      <div className="text-slate-500">High</div>
+                      <div className="font-medium text-slate-800">
+                        {todayHigh ? `₹${todayHigh.price_with_gst.toFixed(2)}` : "—"}
+                      </div>
+                      <div className="text-slate-500">
+                        {todayHigh ? format(new Date(todayHigh.updated_at), "hh:mm a") : ""}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-slate-500">Low</div>
+                      <div className="font-medium text-slate-800">
+                        {todayLow ? `₹${todayLow.price_with_gst.toFixed(2)}` : "—"}
+                      </div>
+                      <div className="text-slate-500">
+                        {todayLow ? format(new Date(todayLow.updated_at), "hh:mm a") : ""}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  <div className="text-sm font-semibold text-slate-700 mb-2">All‑Time Records</div>
+                  <div className="flex flex-wrap gap-6 text-sm">
+                    <div>
+                      <div className="text-slate-500">Highest</div>
+                      <div className="font-medium text-slate-800">
+                        {allTimeHigh ? `₹${allTimeHigh.price_with_gst.toFixed(2)}` : "—"}
+                      </div>
+                      <div className="text-slate-500">
+                        {allTimeHigh ? `${format(new Date(allTimeHigh.updated_at), "MMM dd, yyyy")} • ${format(new Date(allTimeHigh.updated_at), "hh:mm a")}` : ""}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-slate-500">Lowest</div>
+                      <div className="font-medium text-slate-800">
+                        {allTimeLow ? `₹${allTimeLow.price_with_gst.toFixed(2)}` : "—"}
+                      </div>
+                      <div className="text-slate-500">
+                        {allTimeLow ? `${format(new Date(allTimeLow.updated_at), "MMM dd, yyyy")} • ${format(new Date(allTimeLow.updated_at), "hh:mm a")}` : ""}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -545,8 +641,8 @@ export default function Dashboard() {
                   <p>Unable to load chart data</p>
                 </div>
               </div>
-            ) : filteredPriceData.length > 0 ? (
-              <PriceChart data={filteredPriceData} chartType={chartType} />
+              ) : filteredPriceData.length > 0 ? (
+              <PriceChart data={filteredPriceData} chartType={chartType} metal={selectedMetal} />
             ) : (
               <div className="flex items-center justify-center h-64 text-slate-500">
                 <div className="text-center space-y-2">

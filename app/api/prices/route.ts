@@ -208,6 +208,14 @@ function filterDataByTimeframe(
     case "today":
       filterDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
       break
+    case "yesterday": {
+      const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+      const endOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59, 999)
+      return data.filter((item) => {
+        const d = new Date(item.updated_at)
+        return d >= startOfYesterday && d <= endOfYesterday
+      })
+    }
     case "week":
       filterDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
       break

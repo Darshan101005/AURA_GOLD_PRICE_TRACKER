@@ -30,9 +30,10 @@ interface PriceData {
 interface PriceChartProps {
   data: PriceData[]
   chartType?: string
+  metal?: 'gold' | 'silver'
 }
 
-export default function PriceChart({ data, chartType = "line" }: PriceChartProps) {
+export default function PriceChart({ data, chartType = "line", metal = 'gold' }: PriceChartProps) {
   const chartRef = useRef<ChartJS<"line" | "bar">>(null)
 
   if (!data || data.length === 0) {
@@ -46,24 +47,26 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
   // Sort data chronologically for chart
   const sortedData = [...data].sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime())
 
-  // Generate mock OHLC data for candlestick based on real price movements
-  const candlestickData = sortedData.map((item, index) => {
-    const prevPrice = index > 0 ? sortedData[index - 1].price_with_gst : item.price_with_gst
-    const open = prevPrice
-    const close = item.price_with_gst
-    const high = Math.max(open, close, item.aura_buy_price)
-    const low = Math.min(open, close, item.aura_sell_price)
-    const volume = Math.floor(Math.random() * 500000) + 100000 // Mock volume
-
-    return {
-      ...item,
-      open,
-      high,
-      low,
-      close,
-      volume,
-    }
+  // Generate mock volume based on price movement
+  const volumeData = sortedData.map(() => {
+    return Math.floor(Math.random() * 500000) + 100000
   })
+
+  const palette = metal === 'silver'
+    ? {
+        primary: 'rgb(148, 163, 184)', // slate-400
+        primaryFillStrong: 'rgba(148, 163, 184, 0.8)',
+        primaryFill: 'rgba(148, 163, 184, 0.3)',
+        primaryLightFill: 'rgba(148, 163, 184, 0.1)',
+        tooltipBorder: 'rgba(148, 163, 184, 0.5)',
+      }
+    : {
+        primary: 'rgb(202, 138, 4)', // yellow-600
+        primaryFillStrong: 'rgba(202, 138, 4, 0.8)',
+        primaryFill: 'rgba(202, 138, 4, 0.3)',
+        primaryLightFill: 'rgba(202, 138, 4, 0.1)',
+        tooltipBorder: 'rgba(202, 138, 4, 0.5)',
+      }
 
   const getChartData = () => {
     const labels = sortedData.map((item) => {
@@ -79,12 +82,12 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
             {
               label: "Price (₹/g)", // Generic label
               data: sortedData.map((item) => item.price_with_gst),
-              borderColor: "rgb(202, 138, 4)",
-              backgroundColor: "rgba(202, 138, 4, 0.3)",
+              borderColor: palette.primary,
+              backgroundColor: palette.primaryFill,
               borderWidth: 3,
               fill: true,
               tension: 0.4,
-              pointBackgroundColor: "rgb(202, 138, 4)",
+              pointBackgroundColor: palette.primary,
               pointBorderColor: "#fff",
               pointBorderWidth: 2,
               pointRadius: 4,
@@ -100,8 +103,8 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
             {
               label: "Price with GST (₹/g)",
               data: sortedData.map((item) => item.price_with_gst),
-              backgroundColor: "rgba(202, 138, 4, 0.8)",
-              borderColor: "rgb(202, 138, 4)",
+              backgroundColor: palette.primaryFillStrong,
+              borderColor: palette.primary,
               borderWidth: 1,
             },
             {
@@ -127,7 +130,7 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
           datasets: [
             {
               label: "Trading Volume",
-              data: candlestickData.map((item) => item.volume),
+              data: volumeData,
               backgroundColor: "rgba(99, 102, 241, 0.8)",
               borderColor: "rgb(99, 102, 241)",
               borderWidth: 1,
@@ -142,12 +145,12 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
             {
               label: "Price with GST (₹/g)",
               data: sortedData.map((item) => item.price_with_gst),
-              borderColor: "rgb(202, 138, 4)",
-              backgroundColor: "rgba(202, 138, 4, 0.1)",
+              borderColor: palette.primary,
+              backgroundColor: palette.primaryLightFill,
               borderWidth: 3,
               fill: false,
               tension: 0.4,
-              pointBackgroundColor: "rgb(202, 138, 4)",
+              pointBackgroundColor: palette.primary,
               pointBorderColor: "#fff",
               pointBorderWidth: 2,
               pointRadius: 4,
@@ -210,7 +213,7 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
           backgroundColor: "rgba(0, 0, 0, 0.8)",
           titleColor: "#fff",
           bodyColor: "#fff",
-          borderColor: "rgba(202, 138, 4, 0.5)",
+          borderColor: palette.tooltipBorder,
           borderWidth: 1,
           cornerRadius: 8,
           displayColors: true,
@@ -278,10 +281,7 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
     return baseOptions
   }
 
-  // Render candlestick chart
-  if (chartType === "candlestick") {
-    return <CandlestickChart data={candlestickData} />
-  }
+  // Candlestick chart removed
 
   const chartData = getChartData()
   const options = getChartOptions()
@@ -293,106 +293,6 @@ export default function PriceChart({ data, chartType = "line" }: PriceChartProps
       ) : (
         <Line ref={chartRef as any} data={chartData} options={options} />
       )}
-    </div>
-  )
-}
-
-// Candlestick Chart Component
-function CandlestickChart({ data }: { data: any[] }) {
-  if (data.length === 0) {
-    return (
-      <div className="h-96 w-full flex items-center justify-center text-slate-500">
-        No data available for candlestick chart
-      </div>
-    )
-  }
-
-  const maxPrice = Math.max(...data.map((d) => d.high))
-  const minPrice = Math.min(...data.map((d) => d.low))
-  const priceRange = maxPrice - minPrice || 1
-
-  return (
-    <div className="h-96 w-full p-4">
-      <div className="h-full flex flex-col">
-        <div className="flex-1 relative bg-slate-50 rounded-lg p-4">
-          <svg width="100%" height="100%" className="overflow-visible">
-            {/* Grid Lines */}
-            {[0, 0.25, 0.5, 0.75, 1].map((ratio, index) => (
-              <g key={index}>
-                <line
-                  x1="0"
-                  y1={`${ratio * 100}%`}
-                  x2="100%"
-                  y2={`${ratio * 100}%`}
-                  stroke="rgba(0, 0, 0, 0.1)"
-                  strokeWidth="1"
-                />
-                <text x="10" y={`${ratio * 100}%`} dy="0.3em" fill="#64748b" fontSize="12" fontWeight="500">
-                  ₹{(maxPrice - ratio * priceRange).toFixed(0)}
-                </text>
-              </g>
-            ))}
-
-            {/* Candlesticks */}
-            {data.map((candle, index) => {
-              const x = (index / Math.max(data.length - 1, 1)) * 85 + 7.5 // 7.5% margin on each side
-              const highY = ((maxPrice - candle.high) / priceRange) * 100
-              const lowY = ((maxPrice - candle.low) / priceRange) * 100
-              const openY = ((maxPrice - candle.open) / priceRange) * 100
-              const closeY = ((maxPrice - candle.close) / priceRange) * 100
-
-              const bodyTop = Math.min(openY, closeY)
-              const bodyBottom = Math.max(openY, closeY)
-              const bodyHeight = Math.abs(closeY - openY)
-
-              const isGreen = candle.close >= candle.open
-              const color = isGreen ? "#10b981" : "#ef4444"
-
-              return (
-                <g key={index}>
-                  {/* High-Low Line */}
-                  <line x1={`${x}%`} y1={`${highY}%`} x2={`${x}%`} y2={`${lowY}%`} stroke={color} strokeWidth="2" />
-
-                  {/* Body Rectangle */}
-                  <rect
-                    x={`${x - 1}%`}
-                    y={`${bodyTop}%`}
-                    width="2%"
-                    height={`${Math.max(bodyHeight, 0.5)}%`}
-                    fill={isGreen ? color : "transparent"}
-                    stroke={color}
-                    strokeWidth="2"
-                    rx="1"
-                  />
-
-                  {/* Hover Area */}
-                  <rect x={`${x - 2}%`} y="0%" width="4%" height="100%" fill="transparent" className="cursor-pointer">
-                    <title>
-                      {format(new Date(candle.updated_at), "MMM dd, HH:mm")}
-                      {"\n"}Open: ₹{candle.open.toFixed(2)}
-                      {"\n"}High: ₹{candle.high.toFixed(2)}
-                      {"\n"}Low: ₹{candle.low.toFixed(2)}
-                      {"\n"}Close: ₹{candle.close.toFixed(2)}
-                      {"\n"}Volume: {candle.volume.toLocaleString()}
-                    </title>
-                  </rect>
-                </g>
-              )
-            })}
-          </svg>
-        </div>
-
-        {/* Time Labels */}
-        <div className="flex justify-between mt-4 px-4">
-          {data
-            .filter((_, index) => index % Math.max(Math.ceil(data.length / 6), 1) === 0)
-            .map((candle, index) => (
-              <span key={index} className="text-xs font-medium text-slate-600">
-                {format(new Date(candle.updated_at), "MMM dd")}
-              </span>
-            ))}
-        </div>
-      </div>
     </div>
   )
 }
