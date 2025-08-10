@@ -1,16 +1,16 @@
-# 🌟 Aura Digital Gold 24K Price Tracker Dashboard
+# 🌟 Aura Digital Gold 24K and Silver Price Tracker Dashboard
 
-Track **real-time prices**, **historical trends**, and **calculate gold purchases** instantly.
+Track **real-time prices**, **historical trends**, and **calculate gold and silver purchases** instantly.
 
 ## 🌐 Live Website
 
-🔗 **[Aura Gold Price Tracker](https://auragold.netlify.app/)**
+🔗 **[Aura Gold and Silver Price Tracker](https://auragold.netlify.app/)**
 
 ---
 
 ## 📊 Features
 
-* **Real-Time 24K Gold Prices**
+* **Real-Time 24K Gold and silver prices**
 
   * Live **price per gram & per 10 grams**
   * Auto-refresh **every 5 minutes**
@@ -39,7 +39,7 @@ Track **real-time prices**, **historical trends**, and **calculate gold purchase
     * Area Chart
     * Candlestick Chart
     * Bar & Volume Charts
-  * Filter by **30 min, 1 hour, 1 week, 1 month, 1 year, all time**
+  * Filter by **30 min, 1 hour,Today, Yesterday, 1 week, 1 month, 1 year, all time**
 
 * **Export Options**
 
@@ -52,9 +52,15 @@ Track **real-time prices**, **historical trends**, and **calculate gold purchase
 
 ### **Dashboard**
 
-<img width="1886" height="812" alt="image" src="https://github.com/user-attachments/assets/21572b8e-03e9-4d2e-bc2c-cc8824796f60" />
-<img width="1861" height="873" alt="image" src="https://github.com/user-attachments/assets/dfdf4d94-25ee-4ad4-8669-0d0e1119cc89" />
-<img width="1699" height="698" alt="image" src="https://github.com/user-attachments/assets/2cd35a70-f232-49f4-bd5f-ee042e257594" />
+<img width="1626" height="817" alt="image" src="https://github.com/user-attachments/assets/32d79eeb-02c3-47d7-b458-38ccaf1246ae" />
+<img width="1457" height="699" alt="image" src="https://github.com/user-attachments/assets/8009c483-8ad1-4e64-b59a-93e96ea2b5ac" />
+<img width="1392" height="691" alt="image" src="https://github.com/user-attachments/assets/75d94e7d-027b-49ae-bd4a-99bd43c4deb8" />
+<img width="1505" height="816" alt="image" src="https://github.com/user-attachments/assets/5cf0c716-2e3a-4d6e-9ae5-e61e4124483b" />
+<img width="1380" height="888" alt="image" src="https://github.com/user-attachments/assets/3051f39f-8011-4a75-85e4-a358bef2a195" />
+
+
+
+
 
 ---
 
