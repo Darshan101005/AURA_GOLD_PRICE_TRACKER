@@ -63,6 +63,9 @@ export const metadata: Metadata = {
     shortcut: 'https://auragold.in/Shine.svg',
     apple: 'https://auragold.in/Shine.svg',
   },
+  verification: {
+    google: 'Ua57rIKifJyZ1KFTeJdG0L7wCaDMJg42oM_gugB0dWo',
+  },
   generator: 'v0.dev',
 }
 
@@ -74,6 +77,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="google-site-verification" content="Ua57rIKifJyZ1KFTeJdG0L7wCaDMJg42oM_gugB0dWo" />
         <link rel="canonical" href={siteUrl} />
         <script
           type="application/ld+json"
