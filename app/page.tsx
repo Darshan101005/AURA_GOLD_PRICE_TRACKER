@@ -269,8 +269,27 @@ export default function Dashboard() {
   const currentColors = metalColors[selectedMetal]
 
   // Derived stats: today's and all-time high/low with timestamps
-  const { todayHigh, todayLow, allTimeHigh, allTimeLow, todayDiffAmount, todayDiffPercent, allTimeDiffAmount, allTimeDiffPercent } = useMemo(() => {
+  const {
+    todayHigh,
+    todayLow,
+    allTimeHigh,
+    allTimeLow,
+    todayDiffAmount,
+    todayDiffPercent,
+    allTimeDiffAmount,
+    allTimeDiffPercent,
+    // Buy price stats
+    todayBuyHigh,
+    todayBuyLow,
+    allTimeBuyHigh,
+    allTimeBuyLow,
+    todayBuyDiffAmount,
+    todayBuyDiffPercent,
+    allTimeBuyDiffAmount,
+    allTimeBuyDiffPercent,
+  } = useMemo(() => {
     const result = {
+      // Price with GST (display price)
       todayHigh: null as null | PriceData,
       todayLow: null as null | PriceData,
       allTimeHigh: null as null | PriceData,
@@ -279,16 +298,33 @@ export default function Dashboard() {
       todayDiffPercent: 0,
       allTimeDiffAmount: 0,
       allTimeDiffPercent: 0,
+      // Buy price stats
+      todayBuyHigh: null as null | PriceData,
+      todayBuyLow: null as null | PriceData,
+      allTimeBuyHigh: null as null | PriceData,
+      allTimeBuyLow: null as null | PriceData,
+      todayBuyDiffAmount: 0,
+      todayBuyDiffPercent: 0,
+      allTimeBuyDiffAmount: 0,
+      allTimeBuyDiffPercent: 0,
     }
 
     if (!allPriceData || allPriceData.length === 0) return result
 
-    // All-time
+    // All-time (price with GST)
     result.allTimeHigh = allPriceData.reduce((max, curr) =>
       !max || curr.price_with_gst > max.price_with_gst ? curr : max,
     null as null | PriceData)
     result.allTimeLow = allPriceData.reduce((min, curr) =>
       !min || curr.price_with_gst < min.price_with_gst ? curr : min,
+    null as null | PriceData)
+
+    // All-time (buy price)
+    result.allTimeBuyHigh = allPriceData.reduce((max, curr) =>
+      !max || curr.aura_buy_price > max.aura_buy_price ? curr : max,
+    null as null | PriceData)
+    result.allTimeBuyLow = allPriceData.reduce((min, curr) =>
+      !min || curr.aura_buy_price < min.aura_buy_price ? curr : min,
     null as null | PriceData)
 
     // Today (local time)
@@ -301,11 +337,20 @@ export default function Dashboard() {
     })
 
     if (todayData.length > 0) {
+      // Price with GST
       result.todayHigh = todayData.reduce((max, curr) =>
         !max || curr.price_with_gst > max.price_with_gst ? curr : max,
       null as null | PriceData)
       result.todayLow = todayData.reduce((min, curr) =>
         !min || curr.price_with_gst < min.price_with_gst ? curr : min,
+      null as null | PriceData)
+
+      // Buy price
+      result.todayBuyHigh = todayData.reduce((max, curr) =>
+        !max || curr.aura_buy_price > max.aura_buy_price ? curr : max,
+      null as null | PriceData)
+      result.todayBuyLow = todayData.reduce((min, curr) =>
+        !min || curr.aura_buy_price < min.aura_buy_price ? curr : min,
       null as null | PriceData)
 
       if (result.todayHigh && result.todayLow) {
@@ -315,6 +360,14 @@ export default function Dashboard() {
             ? (result.todayDiffAmount / result.todayLow.price_with_gst) * 100
             : 0
       }
+
+      if (result.todayBuyHigh && result.todayBuyLow) {
+        result.todayBuyDiffAmount = result.todayBuyHigh.aura_buy_price - result.todayBuyLow.aura_buy_price
+        result.todayBuyDiffPercent =
+          result.todayBuyLow.aura_buy_price > 0
+            ? (result.todayBuyDiffAmount / result.todayBuyLow.aura_buy_price) * 100
+            : 0
+      }
     }
 
     if (result.allTimeHigh && result.allTimeLow) {
@@ -322,6 +375,14 @@ export default function Dashboard() {
       result.allTimeDiffPercent =
         result.allTimeLow.price_with_gst > 0
           ? (result.allTimeDiffAmount / result.allTimeLow.price_with_gst) * 100
+          : 0
+    }
+
+    if (result.allTimeBuyHigh && result.allTimeBuyLow) {
+      result.allTimeBuyDiffAmount = result.allTimeBuyHigh.aura_buy_price - result.allTimeBuyLow.aura_buy_price
+      result.allTimeBuyDiffPercent =
+        result.allTimeBuyLow.aura_buy_price > 0
+          ? (result.allTimeBuyDiffAmount / result.allTimeBuyLow.aura_buy_price) * 100
           : 0
     }
 
@@ -467,27 +528,29 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* High/Low Stats */}
+              {/* Buy Price Range Only */}
+
+              {/* Buy Price Stats */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                 <div className="rounded-lg border border-yellow-100 bg-yellow-50/50 p-4">
-                  <div className="text-sm font-semibold text-yellow-800 mb-2">Today's Range</div>
+                  <div className="text-sm font-semibold text-yellow-800 mb-2">Today's Buy Price Range</div>
                   <div className="flex flex-wrap gap-6 text-sm">
                     <div>
                       <div className="text-slate-500">High</div>
                       <div className="font-medium text-slate-800">
-                        {todayHigh ? `₹${todayHigh.price_with_gst.toFixed(2)}` : "—"}
+                        {todayBuyHigh ? `₹${todayBuyHigh.aura_buy_price.toFixed(2)}` : "—"}
                       </div>
                       <div className="text-slate-500">
-                        {todayHigh ? format(new Date(todayHigh.updated_at), "hh:mm a") : ""}
+                        {todayBuyHigh ? format(new Date(todayBuyHigh.updated_at), "hh:mm a") : ""}
                       </div>
                     </div>
                     <div>
                       <div className="text-slate-500">Low</div>
                       <div className="font-medium text-slate-800">
-                        {todayLow ? `₹${todayLow.price_with_gst.toFixed(2)}` : "—"}
+                        {todayBuyLow ? `₹${todayBuyLow.aura_buy_price.toFixed(2)}` : "—"}
                       </div>
                       <div className="text-slate-500">
-                        {todayLow ? format(new Date(todayLow.updated_at), "hh:mm a") : ""}
+                        {todayBuyLow ? format(new Date(todayBuyLow.updated_at), "hh:mm a") : ""}
                       </div>
                     </div>
                     <div>
@@ -495,30 +558,42 @@ export default function Dashboard() {
                         <ArrowUpDown className="h-3.5 w-3.5" /> Difference
                       </div>
                       <div className="font-semibold text-slate-800">
-                        {todayHigh && todayLow ? `₹${todayDiffAmount.toFixed(2)} (${todayDiffPercent.toFixed(2)}%)` : "—"}
+                        {todayBuyHigh && todayBuyLow
+                          ? `₹${todayBuyDiffAmount.toFixed(2)} (${todayBuyDiffPercent.toFixed(2)}%)`
+                          : "—"}
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                  <div className="text-sm font-semibold text-slate-700 mb-2">All‑Time Records</div>
+                  <div className="text-sm font-semibold text-slate-700 mb-2">All‑Time Buy Price Records</div>
                   <div className="flex flex-wrap gap-6 text-sm">
                     <div>
                       <div className="text-slate-500">Highest</div>
                       <div className="font-medium text-slate-800">
-                        {allTimeHigh ? `₹${allTimeHigh.price_with_gst.toFixed(2)}` : "—"}
+                        {allTimeBuyHigh ? `₹${allTimeBuyHigh.aura_buy_price.toFixed(2)}` : "—"}
                       </div>
                       <div className="text-slate-500">
-                        {allTimeHigh ? `${format(new Date(allTimeHigh.updated_at), "MMM dd, yyyy")} • ${format(new Date(allTimeHigh.updated_at), "hh:mm a")}` : ""}
+                        {allTimeBuyHigh
+                          ? `${format(new Date(allTimeBuyHigh.updated_at), "MMM dd, yyyy")} • ${format(
+                              new Date(allTimeBuyHigh.updated_at),
+                              "hh:mm a",
+                            )}`
+                          : ""}
                       </div>
                     </div>
                     <div>
                       <div className="text-slate-500">Lowest</div>
                       <div className="font-medium text-slate-800">
-                        {allTimeLow ? `₹${allTimeLow.price_with_gst.toFixed(2)}` : "—"}
+                        {allTimeBuyLow ? `₹${allTimeBuyLow.aura_buy_price.toFixed(2)}` : "—"}
                       </div>
                       <div className="text-slate-500">
-                        {allTimeLow ? `${format(new Date(allTimeLow.updated_at), "MMM dd, yyyy")} • ${format(new Date(allTimeLow.updated_at), "hh:mm a")}` : ""}
+                        {allTimeBuyLow
+                          ? `${format(new Date(allTimeBuyLow.updated_at), "MMM dd, yyyy")} • ${format(
+                              new Date(allTimeBuyLow.updated_at),
+                              "hh:mm a",
+                            )}`
+                          : ""}
                       </div>
                     </div>
                     <div>
@@ -526,8 +601,8 @@ export default function Dashboard() {
                         <ArrowUpDown className="h-3.5 w-3.5" /> Difference
                       </div>
                       <div className="font-semibold text-slate-800">
-                        {allTimeHigh && allTimeLow
-                          ? `₹${allTimeDiffAmount.toFixed(2)} (${allTimeDiffPercent.toFixed(2)}%)`
+                        {allTimeBuyHigh && allTimeBuyLow
+                          ? `₹${allTimeBuyDiffAmount.toFixed(2)} (${allTimeBuyDiffPercent.toFixed(2)}%)`
                           : "—"}
                       </div>
                     </div>
