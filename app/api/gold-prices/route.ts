@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     console.log("Fetching data from external API...")
 
-    const response = await fetch("https://webwatch.store/aura_gold_prices.json", {
+    const response = await fetch("https://webwatch.store/AURA-GOLD/aura_gold_prices.json", {
       method: "GET",
       headers: {
         Accept: "application/json",
