@@ -10,8 +10,8 @@ interface PriceData {
 }
 
 // Base URLs for gold and silver data
-const GOLD_API_URL = "https://webwatch.tech/aura_gold_prices.json"
-const SILVER_API_URL = "https://webwatch.tech/aura_silver_prices.json"
+const GOLD_API_URL = "https://webwatch.store/aura_gold_prices.json"
+const SILVER_API_URL = "https://webwatch.store/aura_silver_prices.json"
 
 // Fetch data from the external JSON endpoint
 async function fetchPriceData(metal: string): Promise<PriceData[]> {
