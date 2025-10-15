@@ -77,7 +77,7 @@ Track **real-time prices**, **historical trends**, and **calculate gold and silv
 
 If you want to run this project locally:
 
-\`\`\`
+```
 # Clone the repository
 git clone https://github.com/Darshan101005/AURA_GOLD_PRICE_TRACKER.git
 
@@ -89,7 +89,7 @@ npm install
 
 # Start the development server
 npm run dev
-\`\`\`
+```
 
 Then open `http://localhost:3000` in your browser.
 
