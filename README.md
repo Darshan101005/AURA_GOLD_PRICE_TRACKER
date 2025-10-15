@@ -102,9 +102,9 @@ Then open `http://localhost:3000` in your browser.
 1. Connect your repository to **Netlify**
 2. Set **Build Command**:
 
-\`\`\`bash
+```bash
 npm run build
-\`\`\`
+```
 
 3. Set **Publish Directory** (check your project type):
 
