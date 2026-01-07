@@ -80,9 +80,9 @@ export default function GoldCalculator({ latestPrice, metalType }: GoldCalculato
   }
 
   return (
-    <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
+    <Card className="backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 border-0 shadow-xl">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-700">
+        <CardTitle className="text-lg font-semibold text-slate-700 dark:text-slate-200">
           {metalType === "gold" ? "Gold" : "Silver"} Purchase Calculator
         </CardTitle>
       </CardHeader>
@@ -105,7 +105,7 @@ export default function GoldCalculator({ latestPrice, metalType }: GoldCalculato
           </RadioGroup>
 
           <div className="space-y-2">
-            <Label htmlFor="input-value" className="text-slate-600">
+            <Label htmlFor="input-value" className="text-slate-600 dark:text-slate-300">
               {calculationType === "rupees" ? "Enter amount in ₹" : "Enter quantity in grams"}
             </Label>
             <Input
@@ -134,26 +134,26 @@ export default function GoldCalculator({ latestPrice, metalType }: GoldCalculato
 
         {calculatedResults && (
           <div className="space-y-4">
-            <h3 className="text-md font-semibold text-slate-700">Calculation Details:</h3>
+            <h3 className="text-md font-semibold text-slate-700 dark:text-slate-200">Calculation Details:</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-600">Current Buy Rate:</span>
-                <span className="font-medium text-slate-800">
+                <span className="text-slate-600 dark:text-slate-300">Current Buy Rate:</span>
+                <span className="font-medium text-slate-800 dark:text-slate-200">
                   {latestPrice ? `₹${latestPrice.aura_buy_price.toFixed(2)}/g` : "N/A"}
                 </span>
               </div>
               <Separator />
               <div className="flex justify-between">
-                <span className="text-slate-600">{metalType === "gold" ? "Gold" : "Silver"} Quantity:</span>
-                <span className="font-medium text-slate-800">{calculatedResults.goldQuantity.toFixed(4)} g</span>
+                <span className="text-slate-600 dark:text-slate-300">{metalType === "gold" ? "Gold" : "Silver"} Quantity:</span>
+                <span className="font-medium text-slate-800 dark:text-slate-200">{calculatedResults.goldQuantity.toFixed(4)} g</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Value (ex-GST):</span>
-                <span className="font-medium text-slate-800">₹{calculatedResults.goldValue.toFixed(2)}</span>
+                <span className="text-slate-600 dark:text-slate-300">Value (ex-GST):</span>
+                <span className="font-medium text-slate-800 dark:text-slate-200">₹{calculatedResults.goldValue.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">GST ({GST_RATE * 100}%):</span>
-                <span className="font-medium text-slate-800">₹{calculatedResults.gstAmount.toFixed(2)}</span>
+                <span className="text-slate-600 dark:text-slate-300">GST ({GST_RATE * 100}%):</span>
+                <span className="font-medium text-slate-800 dark:text-slate-200">₹{calculatedResults.gstAmount.toFixed(2)}</span>
               </div>
               <Separator />
               <div className="flex justify-between text-lg font-bold text-yellow-600">

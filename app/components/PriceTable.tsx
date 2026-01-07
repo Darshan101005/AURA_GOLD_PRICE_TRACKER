@@ -20,7 +20,7 @@ interface PriceTableProps {
 
 export default function PriceTable({ data }: PriceTableProps) {
   if (data.length === 0) {
-    return <div className="text-center py-8 text-slate-500">No price data available</div>
+    return <div className="text-center py-8 text-slate-500 dark:text-slate-400">No price data available</div>
   }
 
   // Sort data by date (newest first)
@@ -81,15 +81,15 @@ export default function PriceTable({ data }: PriceTableProps) {
 
       <div className="max-h-96 overflow-y-auto">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 sticky top-0">
+          <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0">
             <tr>
-              <th className="text-left p-3 font-semibold text-slate-700">Date & Time</th>
-              <th className="text-left p-3 font-semibold text-slate-700">Product</th>
-              <th className="text-right p-3 font-semibold text-slate-700">Price (₹/g)</th>
-              <th className="text-right p-3 font-semibold text-slate-700">Price (₹/10g)</th>
-              <th className="text-right p-3 font-semibold text-slate-700">Buy Price</th>
-              <th className="text-right p-3 font-semibold text-slate-700">Sell Price</th>
-              <th className="text-center p-3 font-semibold text-slate-700">Change</th>
+              <th className="text-left p-3 font-semibold text-slate-700 dark:text-slate-200">Date & Time</th>
+              <th className="text-left p-3 font-semibold text-slate-700 dark:text-slate-200">Product</th>
+              <th className="text-right p-3 font-semibold text-slate-700 dark:text-slate-200">Price (₹/g)</th>
+              <th className="text-right p-3 font-semibold text-slate-700 dark:text-slate-200">Price (₹/10g)</th>
+              <th className="text-right p-3 font-semibold text-slate-700 dark:text-slate-200">Buy Price</th>
+              <th className="text-right p-3 font-semibold text-slate-700 dark:text-slate-200">Sell Price</th>
+              <th className="text-center p-3 font-semibold text-slate-700 dark:text-slate-200">Change</th>
             </tr>
           </thead>
           <tbody>
@@ -102,24 +102,24 @@ export default function PriceTable({ data }: PriceTableProps) {
               return (
                 <tr
                   key={`${item.updated_at}-${index}`}
-                  className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors duration-200"
+                  className="border-b border-slate-100 dark:border-slate-700"
                 >
                   <td className="p-3">
                     <div className="space-y-1">
-                      <div className="font-medium text-slate-900">
+                      <div className="font-medium text-slate-900 dark:text-slate-100">
                         {format(new Date(item.updated_at), "MMM dd, yyyy")}
                       </div>
-                      <div className="text-xs text-slate-500">{format(new Date(item.updated_at), "hh:mm a")}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">{format(new Date(item.updated_at), "hh:mm a")}</div>
                     </div>
                   </td>
                   <td className="p-3">
-                    <div className="font-medium text-slate-700 text-xs">{item.product_name}</div>
+                    <div className="font-medium text-slate-700 dark:text-slate-200 text-xs">{item.product_name}</div>
                   </td>
                   <td className="p-3 text-right">
-                    <div className="font-semibold text-slate-900">₹{item.price_with_gst.toFixed(2)}</div>
-                    <div className="text-xs text-slate-500">₹{item.price_without_gst.toFixed(2)} (ex-GST)</div>
+                    <div className="font-semibold text-slate-900 dark:text-slate-100">₹{item.price_with_gst.toFixed(2)}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">₹{item.price_without_gst.toFixed(2)} (ex-GST)</div>
                   </td>
-                  <td className="p-3 text-right font-semibold text-slate-900">
+                  <td className="p-3 text-right font-semibold text-slate-900 dark:text-slate-100">
                     ₹{(item.price_with_gst * 10).toFixed(2)}
                   </td>
                   <td className="p-3 text-right">

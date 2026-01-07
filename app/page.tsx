@@ -19,12 +19,16 @@ import {
   BarChart,
   AlertCircle,
   ArrowUpDown,
+  Wallet,
+  Newspaper,
 } from "lucide-react"
 import { format } from "date-fns"
 import PriceChart from "./components/PriceChart"
 import PriceTable from "./components/PriceTable"
 import GoldCalculator from "./components/GoldCalculator"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 interface PriceData {
   product_name: string
@@ -390,8 +394,25 @@ export default function Dashboard() {
   }, [allPriceData])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-950 dark:to-slate-900 p-4">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Theme Toggle, News & Portfolio - Fixed position top-right */}
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+          <Link href="/news">
+            <Button variant="outline" size="sm" className="gap-2 shadow-lg">
+              <Newspaper className="h-4 w-4" />
+              <span className="hidden sm:inline">News</span>
+            </Button>
+          </Link>
+          <Link href="/portfolio">
+            <Button variant="outline" size="sm" className="gap-2 shadow-lg">
+              <Wallet className="h-4 w-4" />
+              <span className="hidden sm:inline">Portfolio</span>
+            </Button>
+          </Link>
+          <ThemeToggle />
+        </div>
+
         {/* Header */}
         <div className="text-center space-y-2">
           <h1
@@ -402,9 +423,9 @@ export default function Dashboard() {
           >
             Aura Digital {selectedMetal === "gold" ? "Gold 24K" : "Silver"}
           </h1>
-          <p className="text-slate-600">Real-time {selectedMetal} price tracking dashboard</p>
+          <p className="text-slate-600 dark:text-slate-400">Real-time {selectedMetal} price tracking dashboard</p>
           {!loading && !error && (
-            <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
+            <div className="flex items-center justify-center gap-2 text-sm text-slate-500 dark:text-slate-400">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               Live Data • Auto-refresh every 5 minutes
             </div>
@@ -424,7 +445,7 @@ export default function Dashboard() {
                 setCustomEndDate(undefined)
               }
             }}
-            className="bg-white/80 rounded-lg shadow-xl p-1"
+            className="bg-white/80 dark:bg-slate-800/80 rounded-lg shadow-xl p-1"
           >
             <ToggleGroupItem
               value="gold"
@@ -470,10 +491,10 @@ export default function Dashboard() {
         {/* Latest Price Card */
         }
         {latestPrice && !loading && (
-          <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
+          <Card className="backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 border-0 shadow-xl">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-slate-700">
+                <CardTitle className="text-lg font-semibold text-slate-700 dark:text-slate-200">
                   Latest {selectedMetal === "gold" ? "Gold" : "Silver"} Price
                 </CardTitle>
                 <Button
@@ -495,7 +516,7 @@ export default function Dashboard() {
                     <span className={cn("text-3xl font-bold", currentColors.text)}>
                       ₹{latestPrice.price_with_gst.toFixed(2)}
                     </span>
-                    <span className="text-sm text-slate-500">/gram</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">/gram</span>
                     {priceChange !== 0 && (
                       <Badge variant={priceChange > 0 ? "default" : "destructive"} className="gap-1">
                         {priceChange > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}₹
@@ -503,28 +524,28 @@ export default function Dashboard() {
                       </Badge>
                     )}
                   </div>
-                  <div className="text-2xl font-semibold text-slate-700">
+                  <div className="text-2xl font-semibold text-slate-700 dark:text-slate-200">
                     ₹{(latestPrice.price_with_gst * 10).toFixed(2)} <span className="text-sm font-normal">/10g</span>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-sm text-slate-600">Buy Price:</span>
-                    <span className="font-semibold text-green-600">₹{latestPrice.aura_buy_price.toFixed(2)}</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">Buy Price:</span>
+                    <span className="font-semibold text-green-600 dark:text-green-400">₹{latestPrice.aura_buy_price.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-slate-600">Sell Price:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">Sell Price:</span>
                     <span className="font-semibold text-red-600">₹{latestPrice.aura_sell_price.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <div className="text-right space-y-1">
-                  <div className="text-sm text-slate-500">Last Updated</div>
-                  <div className="font-medium text-slate-700">
+                  <div className="text-sm text-slate-500 dark:text-slate-400">Last Updated</div>
+                  <div className="font-medium text-slate-700 dark:text-slate-200">
                     {format(new Date(latestPrice.updated_at), "MMM dd, yyyy")}
                   </div>
-                  <div className="text-sm text-slate-500">{format(new Date(latestPrice.updated_at), "hh:mm a")}</div>
+                  <div className="text-sm text-slate-500 dark:text-slate-400">{format(new Date(latestPrice.updated_at), "hh:mm a")}</div>
                 </div>
               </div>
 
@@ -532,32 +553,32 @@ export default function Dashboard() {
 
               {/* Buy Price Stats */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <div className="rounded-lg border border-yellow-100 bg-yellow-50/50 p-4">
-                  <div className="text-sm font-semibold text-yellow-800 mb-2">Today's Buy Price Range</div>
+                <div className="rounded-lg border border-yellow-100 dark:border-yellow-900 bg-yellow-50/50 dark:bg-yellow-900/20 p-4">
+                  <div className="text-sm font-semibold text-yellow-800 dark:text-yellow-400 mb-2">Today's Buy Price Range</div>
                   <div className="flex flex-wrap gap-6 text-sm">
                     <div>
-                      <div className="text-slate-500">High</div>
-                      <div className="font-medium text-slate-800">
+                      <div className="text-slate-500 dark:text-slate-400">High</div>
+                      <div className="font-medium text-slate-800 dark:text-slate-200">
                         {todayBuyHigh ? `₹${todayBuyHigh.aura_buy_price.toFixed(2)}` : "—"}
                       </div>
-                      <div className="text-slate-500">
+                      <div className="text-slate-500 dark:text-slate-400">
                         {todayBuyHigh ? format(new Date(todayBuyHigh.updated_at), "hh:mm a") : ""}
                       </div>
                     </div>
                     <div>
-                      <div className="text-slate-500">Low</div>
-                      <div className="font-medium text-slate-800">
+                      <div className="text-slate-500 dark:text-slate-400">Low</div>
+                      <div className="font-medium text-slate-800 dark:text-slate-200">
                         {todayBuyLow ? `₹${todayBuyLow.aura_buy_price.toFixed(2)}` : "—"}
                       </div>
-                      <div className="text-slate-500">
+                      <div className="text-slate-500 dark:text-slate-400">
                         {todayBuyLow ? format(new Date(todayBuyLow.updated_at), "hh:mm a") : ""}
                       </div>
                     </div>
                     <div>
-                      <div className="text-slate-500 flex items-center gap-1">
+                      <div className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
                         <ArrowUpDown className="h-3.5 w-3.5" /> Difference
                       </div>
-                      <div className="font-semibold text-slate-800">
+                      <div className="font-semibold text-slate-800 dark:text-slate-200">
                         {todayBuyHigh && todayBuyLow
                           ? `₹${todayBuyDiffAmount.toFixed(2)} (${todayBuyDiffPercent.toFixed(2)}%)`
                           : "—"}
@@ -565,15 +586,15 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
-                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                  <div className="text-sm font-semibold text-slate-700 mb-2">All‑Time Buy Price Records</div>
+                <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4">
+                  <div className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">All‑Time Buy Price Records</div>
                   <div className="flex flex-wrap gap-6 text-sm">
                     <div>
-                      <div className="text-slate-500">Highest</div>
-                      <div className="font-medium text-slate-800">
+                      <div className="text-slate-500 dark:text-slate-400">Highest</div>
+                      <div className="font-medium text-slate-800 dark:text-slate-200">
                         {allTimeBuyHigh ? `₹${allTimeBuyHigh.aura_buy_price.toFixed(2)}` : "—"}
                       </div>
-                      <div className="text-slate-500">
+                      <div className="text-slate-500 dark:text-slate-400">
                         {allTimeBuyHigh
                           ? `${format(new Date(allTimeBuyHigh.updated_at), "MMM dd, yyyy")} • ${format(
                               new Date(allTimeBuyHigh.updated_at),
@@ -583,11 +604,11 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div>
-                      <div className="text-slate-500">Lowest</div>
-                      <div className="font-medium text-slate-800">
+                      <div className="text-slate-500 dark:text-slate-400">Lowest</div>
+                      <div className="font-medium text-slate-800 dark:text-slate-200">
                         {allTimeBuyLow ? `₹${allTimeBuyLow.aura_buy_price.toFixed(2)}` : "—"}
                       </div>
-                      <div className="text-slate-500">
+                      <div className="text-slate-500 dark:text-slate-400">
                         {allTimeBuyLow
                           ? `${format(new Date(allTimeBuyLow.updated_at), "MMM dd, yyyy")} • ${format(
                               new Date(allTimeBuyLow.updated_at),
@@ -597,10 +618,10 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div>
-                      <div className="text-slate-500 flex items-center gap-1">
+                      <div className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
                         <ArrowUpDown className="h-3.5 w-3.5" /> Difference
                       </div>
-                      <div className="font-semibold text-slate-800">
+                      <div className="font-semibold text-slate-800 dark:text-slate-200">
                         {allTimeBuyHigh && allTimeBuyLow
                           ? `₹${allTimeBuyDiffAmount.toFixed(2)} (${allTimeBuyDiffPercent.toFixed(2)}%)`
                           : "—"}
@@ -618,7 +639,7 @@ export default function Dashboard() {
 
         {/* Chart Controls */}
         {!loading && (
-          <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
+          <Card className="backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 border-0 shadow-xl">
             <CardContent className="p-6">
               <div className="flex flex-wrap gap-4 items-center justify-between mb-4">
                 {/* Timeframe Tabs */}
@@ -641,7 +662,7 @@ export default function Dashboard() {
 
                 {/* Chart Type Selector */}
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-slate-600">Chart Type:</span>
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Chart Type:</span>
                   <div className="flex gap-1">
                     {chartTypes.map((type) => (
                       <Button
@@ -677,7 +698,7 @@ export default function Dashboard() {
 
               {/* Custom Date Range */}
               {activeTimeframe === "custom" && (
-                <div className="flex flex-wrap gap-4 items-center p-4 bg-slate-50 rounded-lg">
+                <div className="flex flex-wrap gap-4 items-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">From:</span>
                     <Popover>
@@ -723,10 +744,10 @@ export default function Dashboard() {
         )}
 
         {/* Chart */}
-        <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
+        <Card className="backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 border-0 shadow-xl">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-slate-700">
+              <CardTitle className="text-lg font-semibold text-slate-700 dark:text-slate-200">
                 {selectedMetal === "gold" ? "Gold" : "Silver"} Price Trend -{" "}
                 {chartTypes.find((t) => t.id === chartType)?.label}
               </CardTitle>
@@ -745,11 +766,11 @@ export default function Dashboard() {
               <div className="flex items-center justify-center h-64">
                 <div className="text-center space-y-4">
                   <RefreshCw className={cn("h-8 w-8 animate-spin mx-auto", currentColors.spinner)} />
-                  <p className="text-slate-600">Loading price data...</p>
+                  <p className="text-slate-600 dark:text-slate-300">Loading price data...</p>
                 </div>
               </div>
             ) : error ? (
-              <div className="flex items-center justify-center h-64 text-slate-500">
+              <div className="flex items-center justify-center h-64 text-slate-500 dark:text-slate-400">
                 <div className="text-center space-y-2">
                   <AlertCircle className="h-12 w-12 mx-auto text-slate-400" />
                   <p>Unable to load chart data</p>
@@ -758,9 +779,9 @@ export default function Dashboard() {
               ) : filteredPriceData.length > 0 ? (
               <PriceChart data={filteredPriceData} chartType={chartType} metal={selectedMetal} />
             ) : (
-              <div className="flex items-center justify-center h-64 text-slate-500">
+              <div className="flex items-center justify-center h-64 text-slate-500 dark:text-slate-400">
                 <div className="text-center space-y-2">
-                  <BarChart3 className="h-12 w-12 mx-auto text-slate-400" />
+                  <BarChart3 className="h-12 w-12 mx-auto text-slate-400 dark:text-slate-500" />
                   <p>No data available for the selected timeframe</p>
                 </div>
               </div>
@@ -770,10 +791,10 @@ export default function Dashboard() {
 
         {/* Price Table */}
         {showTable && !loading && (
-          <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
+          <Card className="backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 border-0 shadow-xl">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-slate-700">
+                <CardTitle className="text-lg font-semibold text-slate-700 dark:text-slate-200">
                   Historical {selectedMetal === "gold" ? "Gold" : "Silver"} Prices
                 </CardTitle>
                 <Badge variant="outline" className="text-xs">
@@ -783,9 +804,9 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {error ? (
-                <div className="flex items-center justify-center h-32 text-slate-500">
+                <div className="flex items-center justify-center h-32 text-slate-500 dark:text-slate-400">
                   <div className="text-center space-y-2">
-                    <AlertCircle className="h-8 w-8 mx-auto text-slate-400" />
+                    <AlertCircle className="h-8 w-8 mx-auto text-slate-400 dark:text-slate-500" />
                     <p>Unable to load table data</p>
                   </div>
                 </div>
@@ -798,7 +819,7 @@ export default function Dashboard() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-12 py-6 text-center text-slate-600 text-sm">
+      <footer className="mt-12 py-6 text-center text-slate-600 dark:text-slate-400 text-sm">
         <p className="flex items-center justify-center gap-1">
           Made with <span className="text-red-500">❤️</span> by Darshan
         </p>

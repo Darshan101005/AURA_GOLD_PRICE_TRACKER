@@ -38,7 +38,7 @@ export default function PriceChart({ data, chartType = "line", metal = 'gold' }:
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-96 w-full flex items-center justify-center text-slate-500">
+      <div className="h-96 w-full flex items-center justify-center text-slate-500 dark:text-slate-400">
         <p>No data available to display chart</p>
       </div>
     )
